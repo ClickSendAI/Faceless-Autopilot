@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, RefreshCw, AlertCircle } from "lucide-react"
-import { api } from "@/lib/api"
+import { checkAllServicesHealth } from "@/lib/api"
 
 export function ServicesStatus() {
   const [services, setServices] = useState({
@@ -19,7 +19,7 @@ export function ServicesStatus() {
   const checkServices = async () => {
     setLoading(true)
     try {
-      const health = await api.checkAllServicesHealth()
+      const health = await checkAllServicesHealth()
       setServices(health)
       setLastChecked(new Date())
     } catch (error) {
