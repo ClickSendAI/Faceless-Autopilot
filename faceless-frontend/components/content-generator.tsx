@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -60,39 +61,74 @@ export function ContentGenerator({ onGenerate }: ContentGeneratorProps) {
   ]
 
   const handleGenerate = async () => {
+    if (!formData.topic || !formData.niche || formData.platforms.length === 0) {
+      alert("Please fill in all required fields")
+      return
+    }
+
     setIsGenerating(true)
     setProgress(0)
     
-    // Simulate AI generation process
-    const steps = [
-      "Analyzing trending topics...",
-      "Generating script...",
-      "Creating voiceover...",
-      "Assembling video...",
-      "Optimizing for platforms..."
-    ]
-    
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setProgress((i + 1) * 20)
+    try {
+      // Call the real AI Content API
+      const response = await api.aiContent.generateContent({
+        topic: formData.topic,
+        niche: formData.niche,
+        format: formData.format as 'short' | 'medium' | 'long' || 'short',
+        duration: formData.format === 'tips & tricks' ? 60 : formData.format === 'educational' ? 180 : 300,
+        voice_id: formData.voice || 'default',
+        platforms: formData.platforms,
+        style: 'educational',
+        tone: 'professional'
+      })
+
+      setProgress(50)
+      
+      // Poll for status updates
+      const pollStatus = async () => {
+        try {
+          const statusResponse = await api.aiContent.getContentStatus(response.content_id)
+          setProgress(Math.min(90, progress + 10))
+          
+          if (statusResponse.status === 'completed') {
+            setProgress(100)
+            setIsGenerating(false)
+            
+            const generatedContent = {
+              id: response.content_id,
+              title: `AI-Generated: ${formData.topic}`,
+              description: `Automatically generated content about ${formData.topic}`,
+              platform: formData.platforms[0] || "youtube",
+              thumbnail: "/placeholder.svg",
+              video_url: statusResponse.video_url,
+              views: "0",
+              engagement: "0%",
+              status: "generated"
+            }
+            
+            onGenerate(generatedContent)
+          } else if (statusResponse.status === 'failed') {
+            alert(`Generation failed: ${statusResponse.error_message}`)
+            setIsGenerating(false)
+          } else {
+            // Continue polling
+            setTimeout(pollStatus, 2000)
+          }
+        } catch (error) {
+          console.error('Error polling status:', error)
+          alert("Error checking generation status")
+          setIsGenerating(false)
+        }
+      }
+
+      // Start polling after a short delay
+      setTimeout(pollStatus, 2000)
+
+    } catch (error) {
+      console.error('Content generation failed:', error)
+      alert("Failed to start content generation")
+      setIsGenerating(false)
     }
-    
-    setIsGenerating(false)
-    setProgress(100)
-    
-    // Generate mock content
-    const generatedContent = {
-      id: Date.now(),
-      title: `AI-Generated: ${formData.topic}`,
-      description: `Automatically generated content about ${formData.topic}`,
-      platform: formData.platforms[0] || "youtube",
-      thumbnail: "/placeholder.svg",
-      views: "0",
-      engagement: "0%",
-      status: "generated"
-    }
-    
-    onGenerate(generatedContent)
   }
 
   return (

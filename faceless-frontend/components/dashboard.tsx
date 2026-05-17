@@ -7,12 +7,16 @@ import { StatsCards } from "@/components/stats-cards"
 import { ContentGrid } from "@/components/content-grid"
 import { QuickActions } from "@/components/quick-actions"
 import { ContentGenerator } from "@/components/content-generator"
-import { AnalyticsDashboard } from "@/components/analytics-dashboard"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard-real"
+import { ServicesStatus } from "@/components/services-status"
+import { ContentUpload } from "@/components/content-upload"
+import { ContentManagement } from "@/components/content-management"
 
 export function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [generatedContent, setGeneratedContent] = useState([])
+  const [selectedContent, setSelectedContent] = useState(null)
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -55,31 +59,54 @@ export function Dashboard() {
               >
                 Generate Content
               </button>
-              <button
-                onClick={() => setActiveTab("analytics")}
-                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  activeTab === "analytics" 
-                    ? "bg-background text-foreground shadow-sm" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Analytics
-              </button>
+                      <button
+                        onClick={() => setActiveTab("analytics")}
+                        className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          activeTab === "analytics" 
+                            ? "bg-background text-foreground shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Analytics
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("upload")}
+                        className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          activeTab === "upload" 
+                            ? "bg-background text-foreground shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Upload
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("manage")}
+                        className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          activeTab === "manage" 
+                            ? "bg-background text-foreground shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Manage
+                      </button>
             </div>
 
             {/* Tab Content */}
-            {activeTab === "overview" && (
-              <>
-                {/* Stats Cards */}
-                <StatsCards />
+                    {activeTab === "overview" && (
+                      <>
+                        {/* Services Status */}
+                        <ServicesStatus />
 
-                {/* Quick Actions */}
-                <QuickActions />
+                        {/* Stats Cards */}
+                        <StatsCards />
 
-                {/* Recent Content */}
-                <ContentGrid />
-              </>
-            )}
+                        {/* Quick Actions */}
+                        <QuickActions />
+
+                        {/* Recent Content */}
+                        <ContentGrid />
+                      </>
+                    )}
 
             {activeTab === "generate" && (
               <ContentGenerator onGenerate={(content) => setGeneratedContent([...generatedContent, content])} />
@@ -87,6 +114,20 @@ export function Dashboard() {
 
             {activeTab === "analytics" && (
               <AnalyticsDashboard />
+            )}
+
+            {activeTab === "upload" && (
+              <ContentUpload 
+                content={selectedContent} 
+                onUploadComplete={(result) => {
+                  console.log('Upload completed:', result)
+                  // Handle upload completion
+                }} 
+              />
+            )}
+
+            {activeTab === "manage" && (
+              <ContentManagement />
             )}
           </div>
         </main>
