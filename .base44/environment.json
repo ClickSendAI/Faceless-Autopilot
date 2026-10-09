@@ -1,0 +1,22 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "OPENAI_API_KEY",
+      "description": "OpenAI API key for GPT-4 script generation. Get it from https://platform.openai.com/api-keys",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "ELEVENLABS_API_KEY",
+      "description": "ElevenLabs API key for voice synthesis. Get it from https://elevenlabs.io/app/settings/api-keys",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "PEXELS_API_KEY",
+      "description": "Pexels API key for stock footage search. Get it from https://www.pexels.com/api/",
+      "requiredAtBoot": false
+    }
+  ]
+}

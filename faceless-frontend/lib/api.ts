@@ -3,9 +3,9 @@
  */
 
 const API_BASE_URLS = {
-  AI_CONTENT: 'http://localhost:8561',
-  PLATFORM_APIS: 'http://localhost:8562',
-  ANALYTICS: 'http://localhost:8563',
+  AI_CONTENT: process.env.NEXT_PUBLIC_AI_CONTENT_URL || 'http://localhost:8561',
+  PLATFORM_APIS: process.env.NEXT_PUBLIC_PLATFORM_APIS_URL || 'http://localhost:8562',
+  ANALYTICS: process.env.NEXT_PUBLIC_ANALYTICS_URL || 'http://localhost:8563',
 }
 
 // AI Content Service API
@@ -169,6 +169,7 @@ export const api = {
   aiContent: aiContentAPI,
   platform: platformAPI,
   analytics: analyticsAPI,
+  checkAllServicesHealth,
 };
 
 // Utility function to check all services health
